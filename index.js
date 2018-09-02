@@ -14,6 +14,6 @@ const schema = makeExecutableSchema({
 const server = new ApolloServer({ schema });
 server.applyMiddleware({ app });
 
-models.sequelize.sync().then(() => {
+models.sequelize.sync({ force: true }).then(() => {
   app.listen({ port: PORT });
 });
