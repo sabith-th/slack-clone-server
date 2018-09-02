@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 const sequelize = new Sequelize('slack', 'developer', 'developer', {
   dialect: 'postgres',
   operatorsAliases: Sequelize.Op,
+  underscored: true,
 });
 
 const models = {
