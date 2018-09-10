@@ -7,6 +7,20 @@ export default {
       const { id } = user;
       return models.Team.findAll({ where: { owner: id } }, { raw: true });
     }),
+    guestTeams: requiresAuth.createResolver(async (parent, args, { models, user }) => {
+      const { id } = user;
+      return models.Team.findAll(
+        {
+          include: [
+            {
+              model: models.User,
+              where: { id },
+            },
+          ],
+        },
+        { raw: true },
+      );
+    }),
   },
   Mutation: {
     addTeamMember: requiresAuth.createResolver(
