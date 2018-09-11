@@ -4,8 +4,12 @@ export default gql`
   type Message {
     id: Int!
     text: String!
-    user: User!
-    channel: Channel!
+    userId: Int!
+    channelId: Int!
+  }
+
+  type Query {
+    messages(channelId: Int!): [Message!]!
   }
 
   type Mutation {

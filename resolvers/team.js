@@ -9,16 +9,12 @@ export default {
     }),
     guestTeams: requiresAuth.createResolver(async (parent, args, { models, user }) => {
       const { id } = user;
-      return models.Team.findAll(
+      return models.sequelize.query(
+        'SELECT * FROM teams JOIN members ON id = team_id WHERE user_id = ?',
         {
-          include: [
-            {
-              model: models.User,
-              where: { id },
-            },
-          ],
+          replacements: [id],
+          model: models.Team,
         },
-        { raw: true },
       );
     }),
   },

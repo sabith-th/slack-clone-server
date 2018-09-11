@@ -1,4 +1,10 @@
 export default {
+  Query: {
+    messages: async (parent, { channelId }, { models }) => {
+      const messages = await models.Message.findAll({ where: { channelId } });
+      return messages;
+    },
+  },
   Mutation: {
     createMessage: async (parent, args, { models, user }) => {
       try {
