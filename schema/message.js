@@ -4,8 +4,9 @@ export default gql`
   type Message {
     id: Int!
     text: String!
-    userId: Int!
-    channelId: Int!
+    user: User!
+    channel: Channel!
+    created_at: String!
   }
 
   type Query {
