@@ -4,6 +4,7 @@ import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
 import path from 'path';
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import cors from 'cors';
+import { createServer } from 'http';
 
 import models from './models';
 import { refreshTokens } from './auth';
@@ -47,15 +48,26 @@ const schema = makeExecutableSchema({
 
 const server = new ApolloServer({
   schema,
-  context: ({ req }) => ({
-    models,
-    user: req.user,
-    SECRET,
-    SECRET2,
-  }),
+  context: ({ req, connection }) => {
+    if (connection) {
+      return {
+        models,
+      };
+    }
+    return {
+      models,
+      user: req.user,
+      SECRET,
+      SECRET2,
+    };
+  },
 });
 server.applyMiddleware({ app });
 
+const httpServer = createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
 models.sequelize.sync().then(() => {
-  app.listen({ port: PORT });
+  // app.listen({ port: PORT });
+  httpServer.listen(PORT);
 });
