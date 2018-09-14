@@ -5,11 +5,11 @@ export default gql`
     id: Int!
     email: String!
     username: String!
-    teams: [Team!]!
+    teams: [Team!]
   }
 
   type Query {
-    getUser(id: Int!): User!
+    me: User!
     allUsers: [User!]!
   }
 

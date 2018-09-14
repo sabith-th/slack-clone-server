@@ -64,19 +64,16 @@ const server = new ApolloServer({
   subscriptions: {
     onConnect: async ({ token, refreshToken }) => {
       if (token && refreshToken) {
-        let user = null;
+        let user = {};
         try {
           ({ user } = jwt.verify(token, SECRET));
         } catch (err) {
           const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
           ({ user } = newTokens);
         }
-        if (!user) {
-          throw new Error('Invalid auth tokens!');
-        }
-        return true;
+        return { models, user };
       }
-      throw new Error('Missing auth tokens!');
+      return { models };
     },
   },
 });
