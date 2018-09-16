@@ -7,20 +7,9 @@ const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
 export default {
   Subscription: {
     newChannelMessage: {
-      subscribe: requiresAuth.createResolver(
-        withFilter(
-          async (parent, { channelId }, { user, models }) => {
-            const channel = await models.Channel.findOne({ where: { id: channelId } });
-            const member = await models.Member.findOne({
-              where: { teamId: channel.teamId, userId: user.id },
-            });
-            if (!member) {
-              throw new Error('Only members can subscribe to messages');
-            }
-            return pubsub.asyncIterator(NEW_CHANNEL_MESSAGE);
-          },
-          (payload, args) => payload.channelId === args.channelId,
-        ),
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+        (payload, args) => payload.channelId === args.channelId,
       ),
     },
   },
