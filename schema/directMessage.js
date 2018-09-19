@@ -10,10 +10,10 @@ export default gql`
   }
 
   type Query {
-    directMessages(receiverId: Int!): [DirectMessage!]!
+    directMessages(teamId: Int!, otherUserId: Int!): [DirectMessage!]!
   }
 
   type Mutation {
-    createDirectMessage(receiverId: Int!, text: String!): Boolean!
+    createDirectMessage(receiverId: Int!, teamId: Int!, text: String!): Boolean!
   }
 `;
