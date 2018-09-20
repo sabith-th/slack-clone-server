@@ -2,6 +2,19 @@ import formatErrors from '../formatErrors';
 import requiresAuth from '../permissions';
 
 export default {
+  Query: {
+    getTeamMembers: requiresAuth.createResolver(async (parent, { teamId }, { models }) => {
+      const teamMembers = await models.sequelize.query(
+        'SELECT * FROM users JOIN members ON members.user_id = users.id WHERE members.team_id = ?',
+        {
+          replacements: [teamId],
+          model: models.User,
+          raw: true,
+        },
+      );
+      return teamMembers;
+    }),
+  },
   Mutation: {
     addTeamMember: requiresAuth.createResolver(
       async (parent, { email, teamId }, { models, user }) => {

@@ -16,8 +16,7 @@ export default gql`
   }
 
   type Query {
-    allTeams: [Team!]!
-    guestTeams: [Team!]
+    getTeamMembers(teamId: Int!): [User!]!
   }
 
   type VoidResponse {
