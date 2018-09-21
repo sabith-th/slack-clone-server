@@ -52,6 +52,7 @@ const server = new ApolloServer({
     if (connection) {
       return {
         models,
+        user: connection.context.user,
       };
     }
     return {
