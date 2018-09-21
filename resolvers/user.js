@@ -21,9 +21,13 @@ export default {
     me: requiresAuth.createResolver((parent, args, { models, user }) => models.User.findOne({
       where: { id: user.id },
     })),
+    getUser: (parent, { userId }, { models }) => models.User.findOne({ where: { id: userId } }),
   },
   Mutation: {
-    login: (parent, { email, password }, { models, SECRET, SECRET2 }) => tryLogin(email, password, models, SECRET, SECRET2),
+    login: async (parent, { email, password }, { models, SECRET, SECRET2 }) => {
+      const response = await tryLogin(email, password, models, SECRET, SECRET2);
+      return response;
+    },
     register: async (parent, args, { models }) => {
       try {
         const user = await models.User.create(args);
