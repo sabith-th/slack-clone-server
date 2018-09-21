@@ -9,6 +9,10 @@ export default gql`
     created_at: String!
   }
 
+  type Subscription {
+    newDirectMessage(teamId: Int!, otherUserId: Int!): DirectMessage!
+  }
+
   type Query {
     directMessages(teamId: Int!, otherUserId: Int!): [DirectMessage!]!
   }

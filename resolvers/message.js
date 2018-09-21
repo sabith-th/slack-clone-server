@@ -1,15 +1,18 @@
-import { PubSub, withFilter } from 'graphql-subscriptions';
-import requiresAuth from '../permissions';
+import { withFilter } from 'graphql-subscriptions';
+import requiresAuth, { requiresTeamAccess } from '../permissions';
 
-const pubsub = new PubSub();
+import pubsub from '../pubsub';
+
 const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
 
 export default {
   Subscription: {
     newChannelMessage: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
-        (payload, args) => payload.channelId === args.channelId,
+      subscribe: requiresTeamAccess.createResolver(
+        withFilter(
+          () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+          (payload, args) => payload.channelId === args.channelId,
+        ),
       ),
     },
   },
