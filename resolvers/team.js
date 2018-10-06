@@ -78,9 +78,10 @@ export default {
   Team: {
     channels: ({ id }, args, { models, user }) => models.sequelize.query(
       `SELECT DISTINCT ON (id) *
-        FROM channels as c, pcmembers as pc
+        FROM channels as c LEFT OUTER JOIN pcmembers as pc
+        ON c.id = pc.channel_id
         WHERE c.team_id = :teamId AND 
-        (c.public = true OR (pc.user_id =:currentUserId AND c.id = pc.channel_id))`,
+        (c.public = true OR pc.user_id =:currentUserId);`,
       {
         replacements: { currentUserId: user.id, teamId: id },
         model: models.Channel,
@@ -92,7 +93,7 @@ export default {
         FROM users AS u JOIN direct_messages AS dm 
         on (u.id = dm.sender_id) OR (u.id = dm.receiver_id) 
         WHERE (:currentUserId = dm.sender_id OR :currentUserId = dm.receiver_id) 
-        AND dm.team_id=:teamId`,
+        AND dm.team_id=:teamId;`,
       {
         replacements: { currentUserId: user.id, teamId: id },
         model: models.User,

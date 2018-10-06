@@ -1,13 +1,12 @@
-import express from 'express';
-import jwt from 'jsonwebtoken';
 import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
-import path from 'path';
-import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import cors from 'cors';
+import express from 'express';
 import { createServer } from 'http';
-
-import models from './models';
+import jwt from 'jsonwebtoken';
+import { fileLoader, mergeResolvers, mergeTypes } from 'merge-graphql-schemas';
+import path from 'path';
 import { refreshTokens } from './auth';
+import models from './models';
 
 const SECRET = 'asongoficeandfire';
 const SECRET2 = 'agameofthrones';
