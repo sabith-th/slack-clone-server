@@ -4,27 +4,46 @@ import requiresAuth from '../permissions';
 export default {
   Mutation: {
     getOrCreateDMChannel: requiresAuth.createResolver(
-      async (parent, { teamId, members }, { models, user }) => {
-        members.push(user.id);
+      async (_parent, { teamId, members }, { models, user }) => {
+        const member = await models.Member.findOne(
+          { where: { teamId, userId: user.id } },
+          { raw: true },
+        );
+        if (!member) {
+          throw new Error('Not Authorized');
+        }
+
+        const allMembers = [...members, user.id];
         const [data] = await models.sequelize.query(
           `
-        SELECT c.id 
+        SELECT c.id, c.name 
         FROM channels AS c, pcmembers AS pc
         WHERE pc.channel_id = c.id AND c.dm = true AND c.public = false AND c.team_id = ${teamId}
-        GROUP BY c.id 
-        HAVING ARRAY_AGG(pc.user_id)@> Array[${members.join(',')}] 
-        AND COUNT(pc.user_id) = ${members.length};
+        GROUP BY c.id, c.name 
+        HAVING ARRAY_AGG(pc.user_id)@> Array[${allMembers.join(',')}] 
+        AND COUNT(pc.user_id) = ${allMembers.length};
       `,
           { raw: true },
         );
+
         if (data.length) {
-          return data[0].id;
+          return data[0];
         }
+
+        const users = await models.User.findAll({
+          raw: true,
+          where: {
+            id: {
+              [models.sequelize.Op.in]: allMembers,
+            },
+          },
+        });
+        const channelName = users.map(u => u.username).join(', ');
 
         const channelId = await models.sequelize.transaction(async (transaction) => {
           const channel = await models.Channel.create(
             {
-              name: 'hello',
+              name: channelName,
               public: false,
               dm: true,
               teamId,
@@ -32,14 +51,14 @@ export default {
             { transaction },
           );
           const cId = channel.dataValues.id;
-          const pcMembers = members.map(m => ({ userId: m, channelId: cId }));
+          const pcMembers = allMembers.map(m => ({ userId: m, channelId: cId }));
           await models.PCMember.bulkCreate(pcMembers, { transaction });
           return cId;
         });
-        return channelId;
+        return { id: channelId, name: channelName };
       },
     ),
-    createChannel: requiresAuth.createResolver(async (parent, args, { models, user }) => {
+    createChannel: requiresAuth.createResolver(async (_parent, args, { models, user }) => {
       try {
         const member = await models.Member.findOne(
           { where: { teamId: args.teamId, userId: user.id } },

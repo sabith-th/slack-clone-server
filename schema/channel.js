@@ -16,6 +16,11 @@ export default gql`
     errors: [Error!]
   }
 
+  type DMChannelResponse {
+    id: Int!
+    name: String!
+  }
+
   type Mutation {
     createChannel(
       teamId: Int!
@@ -23,6 +28,6 @@ export default gql`
       public: Boolean = false
       members: [Int!]
     ): ChannelResponse!
-    getOrCreateDMChannel(teamId: Int!, members: [Int!]): Int!
+    getOrCreateDMChannel(teamId: Int!, members: [Int!]): DMChannelResponse!
   }
 `;
