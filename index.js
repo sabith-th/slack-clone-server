@@ -1,11 +1,13 @@
 import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
 import cors from 'cors';
+import DataLoader from 'dataloader';
 import express from 'express';
 import { createServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { fileLoader, mergeResolvers, mergeTypes } from 'merge-graphql-schemas';
 import path from 'path';
 import { refreshTokens } from './auth';
+import { channelBatcher } from './batchFunctions';
 import models from './models';
 
 const SECRET = 'asongoficeandfire';
@@ -59,6 +61,7 @@ const server = new ApolloServer({
       user: req.user,
       SECRET,
       SECRET2,
+      channelLoader: new DataLoader(ids => channelBatcher(ids, models, req.user)),
     };
   },
   subscriptions: {
