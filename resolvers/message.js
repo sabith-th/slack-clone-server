@@ -1,6 +1,5 @@
 import { withFilter } from 'graphql-subscriptions';
 import requiresAuth, { requiresTeamAccess } from '../permissions';
-
 import pubsub from '../pubsub';
 
 const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
@@ -25,23 +24,32 @@ export default {
     },
   },
   Query: {
-    messages: requiresAuth.createResolver(async (parent, { channelId }, { models, user }) => {
-      const channel = await models.Channel.findOne({ where: { id: channelId }, raw: true });
-      if (!channel.public) {
-        const member = await models.PCMember.findOne({
-          where: { userId: user.id, channelId },
-          raw: true,
-        });
-        if (!member) {
-          throw new Error('Not Authorized');
+    messages: requiresAuth.createResolver(
+      async (parent, { channelId, cursor }, { models, user }) => {
+        const channel = await models.Channel.findOne({ where: { id: channelId }, raw: true });
+        if (!channel.public) {
+          const member = await models.PCMember.findOne({
+            where: { userId: user.id, channelId },
+            raw: true,
+          });
+          if (!member) {
+            throw new Error('Not Authorized');
+          }
         }
-      }
-      const messages = await models.Message.findAll(
-        { order: [['created_at', 'ASC']], where: { channelId } },
-        { raw: true },
-      );
-      return messages;
-    }),
+        const options = {
+          order: [['created_at', 'DESC']],
+          where: { channelId },
+          limit: 35,
+        };
+        if (cursor) {
+          options.where.created_at = {
+            [models.op.lt]: new Date(parseInt(cursor, 10)),
+          };
+        }
+        const messages = await models.Message.findAll(options, { raw: true });
+        return messages;
+      },
+    ),
   },
   Mutation: {
     createMessage: requiresAuth.createResolver(async (parent, args, { models, user }) => {

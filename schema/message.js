@@ -14,7 +14,7 @@ export default gql`
   }
 
   type Query {
-    messages(channelId: Int!): [Message!]!
+    messages(channelId: Int!, cursor: String): [Message!]!
   }
 
   type Mutation {
