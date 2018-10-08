@@ -2,6 +2,7 @@ import Sequelize from 'sequelize';
 
 const sequelize = new Sequelize(process.env.TEST_DB || 'slack', 'developer', 'developer', {
   dialect: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
   operatorsAliases: Sequelize.Op,
   define: {
     underscored: true,
@@ -15,6 +16,7 @@ const models = {
   Team: sequelize.import('./team'),
   Member: sequelize.import('./member'),
   PCMember: sequelize.import('./pcMember'),
+  DirectMessage: sequelize.import('./directMessage'),
 };
 
 Object.keys(models).forEach((modelName) => {
