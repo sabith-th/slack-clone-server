@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { fileLoader, mergeResolvers, mergeTypes } from 'merge-graphql-schemas';
 import path from 'path';
 import { refreshTokens } from './auth';
-import { channelBatcher } from './batchFunctions';
+import { channelBatcher, userBatcher } from './batchFunctions';
 import getModels from './models';
 
 const SECRET = 'asongoficeandfire';
@@ -63,6 +63,7 @@ getModels().then((models) => {
         return {
           models,
           user: connection.context.user,
+          userLoader: connection.context.userLoader,
         };
       }
       return {
@@ -71,10 +72,12 @@ getModels().then((models) => {
         SECRET,
         SECRET2,
         channelLoader: new DataLoader(ids => channelBatcher(ids, models, req.user)),
+        userLoader: new DataLoader(ids => userBatcher(ids, models)),
       };
     },
     subscriptions: {
       onConnect: async ({ token, refreshToken }) => {
+        const userLoader = new DataLoader(ids => userBatcher(ids, models));
         if (token && refreshToken) {
           let user = {};
           try {
@@ -83,9 +86,9 @@ getModels().then((models) => {
             const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
             ({ user } = newTokens);
           }
-          return { models, user };
+          return { models, user, userLoader };
         }
-        return { models };
+        return { models, userLoader };
       },
     },
   });
