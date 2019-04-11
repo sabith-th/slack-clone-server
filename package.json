@@ -16,14 +16,14 @@
   "devDependencies": {
     "axios": "^0.18.0",
     "babel-cli": "^6.26.0",
-    "babel-jest": "^23.6.0",
+    "babel-jest": "^24.7.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-3": "^6.24.1",
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
-    "jest": "^23.6.0",
+    "jest": "^24.7.1",
     "nodemon": "^1.18.4",
     "prettier-eslint": "^8.8.2"
   },
@@ -40,7 +40,7 @@
     "lodash": "^4.17.11",
     "merge-graphql-schemas": "^1.5.3",
     "pg": "^7.4.3",
-    "sequelize": "^4.38.0",
+    "sequelize": "^5.3.0",
     "subscriptions-transport-ws": "^0.9.14"
   }
 }
