@@ -28,7 +28,7 @@
     "prettier-eslint": "^8.8.2"
   },
   "dependencies": {
-    "apollo-server-express": "^2.0.4",
+    "apollo-server-express": "^2.14.2",
     "bcrypt": "^3.0.0",
     "cors": "^2.8.4",
     "dataloader": "^1.4.0",
